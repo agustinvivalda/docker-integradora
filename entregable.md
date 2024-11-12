@@ -11,16 +11,17 @@
 - Ejecute el comando correspondiente para buildear la imágen. Elija un nombre de imágen y un tag acorde. 
 
     ```bash
-    # Inserte aquí el comando utilizado para buildear la imágen
+    docker build -t tp-final:v1.0 C:\Users\agustin.vivalda\Desktop\capacitacion\docker-integradora\app\
+
     ```
 - Muestre cuánto espacio ocupa la imaǵen una vez creada.
 
     ```bash
-    # Inserte aquí el comando utilizado para ver el espacio que ocupa
-    ```
+    docker image ls
+    ```  
 - ¿Puede hacer algo para optimizar o mejorar la imágen?. Describa qué modificaciones puede hacer para optimizar la imágen.
 
-_(Describa que modificaciones podría hacer para mejorar la imágen de ser posible)_
+_Utilizar alguna distribucion más liviana y descargar las herramientas especificas que se utilizaran _
 
 
 
@@ -31,18 +32,21 @@ Una vez creada la imágen, debería ser capaz de correr la aplicación.
 
 - Ejecute un comando para poder correr la aplicación.
     ```bash
-    # Inserte aquí el comando para ejecutar la aplicación
+    # docker run -d -p 8080:3000 tp-final
     ```
 - Explique el comando y cada parámetro enviado.
 
-    _(Realice una explicación de los parámetros aquí)_
+    _-d : indica que el contenedor se ejecuta en segundo plano, osea que si la termina se cierra el contenedor continúa ejecutándose 
+    -p 8080:3000 : indica que la aplicacion esta escuchando en el puerto 3000 y que se mostrará en localhost://8080
+    tp_final:v1.0 : indica el contenedor que hay que correr con su respectiva version _
 - Muestre una captura de pantalla o un copy-paste del contenedor corriendo.
 
-    _(Inserte aquí la captura de pantalla o los la salida de la shell con el contenedor corriendo)_
+    _CONTAINER ID   IMAGE           COMMAND               CREATED          STATUS          PORTS                    NAMES
+313b81797b31   tp-final:v1.0   "node src/index.js"   17 minutes ago   Up 17 minutes   0.0.0.0:8080->3000/tcp   confident_vaughan_
 
 - Adjunte una captura de pantalla con la aplicación funcionando con la URL utilizada para acceder.
 
-    ![Screenshot](./imgs/img_placeholder.png)
+    ![Screenshot](./imgs/captura8080.png)
 
 
 ## Parte 2 - Actualizar aplicación (imágen)
@@ -52,12 +56,14 @@ Una vez creada la imágen, debería ser capaz de correr la aplicación.
 - Ejecutemos los comando necesarios para que la aplicación tome los cambios. Realice un etiquetado (tag) coherente respecto a los cambios en la imágen
     
     ```bash
-    # Inserte aquí los comando necesarios
+    # docker build -t tp-final:v1.1 .       //re-buildeo para que tome el cambio de código
+    # docker run -d -p 8081:3000 --name v1.1 tp-final:v1.1        // lo corro en un puerto distinto al anterior para tener ambos en simultáneo y le pongo un nombre al contenedor
+    
     ```
 
 - Mostrar captura de pantalla con la app corriendo con las modificaciones realizadas.
 
-    ![Screenshot](./imgs/img_placeholder.png)
+    ![Screenshot](./imgs/captura8081.png)
 
 > La actualizaciones realizadas, dejan a la primera versión obsoleta
 
@@ -66,13 +72,16 @@ Una vez creada la imágen, debería ser capaz de correr la aplicación.
 - Elimine la imágen y el contenedor hecho en el punto anterior
 
     ```bash
-    # Inserte los comando utilizados para eliminar la imágen
+    # docker stop 313b81    // detengo la ejecucion del contenedor utilizando la primer parte del containerID
+    # docker rm 313b81      // elimino el contenedor detenido
+    # docker rmi c332       // elimino la imagen obsoleta utilizando la primer parte del imageID
     ```
 
 - Liste las imágenes y contenedores para ver que ya no existen.
 
     ```bash
-    # Inserte comando para realizar lo solicitado
+    # docker ps -a
+    # docker images
     ```
 
 
@@ -87,12 +96,14 @@ Para compartir la imágen de la aplicación usaremos la registry de [DockerHub](
 - Escriba los comandos necesarios para que sea posible subir la imaǵen correctamente.
 
     ```bash
-    # Inserte aquí los comandos utilizados
+    # docker image tag tp-final:v1.1 dazzledd/tp-final:v1.1
+    # docker login
+    # docker push dazzledd/tp-final:v1.1
     ```
 
-- Comparta la URL de DockerHub para que pueda ser posible probar y descargar su imágen.
+- Comparta la URL de DockerHub para que pueda ser posible probar y descargar su imágen.VA
 
-    [Actualice el link](https://docker.idepba.com.ar)
+    [Actualice el link](https://hub.docker.com/repository/docker/dazzledd/tp-final/general)
 
 - Agregue un _overview_ para el repositorio de Dockerhub con instrucciones para correr la imágen y todo lo que considere necesario para que un tercero pueda ejecutar la imágen.
 
@@ -107,11 +118,12 @@ Los datos en esta APP se guardan en un archivo `/etc/todos/todo.db`.
 - Escriba los comandos utilizados para realizar lo solicitado con la explicación correspondiente.
 
     ```bash
-    # Inserte los comandos utilizados
+    # docker volume create vol-entregable      // creamos el volumen
+    # docker run -d -p 8080:3000 -v vol-entregable:/etc/todos/todo.db tp-final:v1.1  // corremos la imagen con su respectivo volumen 
     ```
 
 - Decida que tipo de persistencia es la adecuada para la app.
-
+ Lo mas adecuado es una persistencia en volumenes ya que presentan varias ventajas tales como facilidad para realizar copias de seguridad, administración del volumen a traves de comandos y se crea al momento de levantar la aplicación. 
 > [!TIP]
 > Repase [volúmenes y persistencia](https://docker.idepba.com.ar/clase4.html#/volumenes) de datos.
 
@@ -122,17 +134,17 @@ Los datos en esta APP se guardan en un archivo `/etc/todos/todo.db`.
 - [Crear una red](https://docker.idepba.com.ar/clase4.html#/network_create) para conexión entre los contenedores que servirá también para conectar a la aplicación.
 
     ```bash
-    # Inserte el comando utilizado
+    # docker network create net-entregable
     ```
 - [Crear un nuevo volumen](https://docker.idepba.com.ar/clase4.html#/volume_create) para persistir los datos de la base MySQL. El path donde se almacenan los datos en el contenedor MySQL es `/var/lib/mysql`.
     
     ```bash
-    # Comando para crear nuevo volumen utilizado
+    # docker volume create vol-entregable
     ```
 - Iniciar el contenedor de la aplicación utilizando el comando `docker run` enviando las variables de entornos necesarias para la conexión con la base de datos.
 
     ```bash
-    # Inserte el comando necesario para realizar lo solicitado
+    # docker run --name mysql -v vol-entregable:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw,MYSQL_DATABASE=todos -d mysql:8.0
     ```
 
 > [!TIP]
@@ -146,7 +158,38 @@ Los datos en esta APP se guardan en un archivo `/etc/todos/todo.db`.
 En la carpeta raíz del proyecto, cree un archivo de docker compose `compose.yml` o `docker-compose.yml`. Adicionalmente pégue el contenido del archivo `compose` en este lugar:
 
 ```compose
-# Copie aquí el contenido del archivo compose.
+# 
+name: todolist
+services:
+    mysql:
+        container_name: mysql
+        image: mysql:8.0
+        volumes:
+            - vol-entregable:/var/lib/mysql
+        environment:
+            MYSQL_USER: tpfinal
+            MYSQL_PASSWORD: tpfinal
+            MYSQL_ROOT_PASSWORD: tpfinal
+            MYSQL_DATABASE: todos
+
+    tp-final:
+        image: dazzledd/tp-final:v1.1
+        ports:
+            - 8080:3000
+        environment:
+            MYSQL_HOST: mysql
+            MYSQL_USER: tpfinal
+            MYSQL_PASSWORD: tpfinal
+            MYSQL_DB: todos
+        depends_on: 
+           - mysql
+        restart: always
+networks:
+    net-entregable:
+        name: net-entregable
+volumes:
+    vol-entregable:
+        name: vol-entregable
 ```
 
 > [!IMPORTANT]  

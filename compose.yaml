@@ -1,0 +1,31 @@
+name: todolist
+services:
+    mysql:
+        container_name: mysql
+        image: mysql:8.0
+        volumes:
+            - vol-entregable:/var/lib/mysql
+        environment:
+            MYSQL_USER: tpfinal
+            MYSQL_PASSWORD: tpfinal
+            MYSQL_ROOT_PASSWORD: tpfinal
+            MYSQL_DATABASE: todos
+
+    tp-final:
+        image: dazzledd/tp-final:v1.1
+        ports:
+            - 8080:3000
+        environment:
+            MYSQL_HOST: mysql
+            MYSQL_USER: tpfinal
+            MYSQL_PASSWORD: tpfinal
+            MYSQL_DB: todos
+        depends_on: 
+           - mysql
+        restart: always
+networks:
+    net-entregable:
+        name: net-entregable
+volumes:
+    vol-entregable:
+        name: vol-entregable
